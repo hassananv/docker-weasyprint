@@ -24,7 +24,7 @@ def css_for_extra_fonts():
             font-family: 'Noto Sans Light';
             src: local('NotoSans-Light');
         }
-        @font-face {
+        @font-face {rr
             font-family: 'Noto Sans Light Italic';
             src: local('NotoSans-LightItalic');
         }
