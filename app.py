@@ -5,7 +5,6 @@ import logging
 
 from flask import Flask, request, make_response
 from weasyprint import HTML
-from weasyprint.fonts import FontConfiguration
 from fonts import css_for_extra_fonts
 
 app = Flask('pdf')
@@ -51,10 +50,11 @@ def home():
 @app.route('/pdf', methods=['POST'])
 def generate():
     name = request.args.get('filename', 'unnamed.pdf')
+    add_bootstrap_style = bool(request.args.get('bootstrap', 'false').lower()=='true')    
     app.logger.info('POST  /pdf?filename=%s' % name)
     #print ( request.get_data(as_text=True) )
     html = HTML(string=request.get_data(as_text=True))
-    css, font_config = css_for_extra_fonts()
+    css, font_config = css_for_extra_fonts(add_bootstrap_style)
     pdf = html.write_pdf(stylesheets=[css], font_config=font_config)
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
@@ -94,4 +94,5 @@ def multiple():
 
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    app.run(host='0.0.0.0', port=5001)

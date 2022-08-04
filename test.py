@@ -10,10 +10,11 @@ html_data = '''
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test File</title>
+    <title>Test File</title>    
 </head>
 <body>
     <h1>Hello World</h1>
+    <input id="interactive-text-1" style="width:6rem; height:1.5rem; " alt="Test Text" />    
 </body>
 </html>
 '''
