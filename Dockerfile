@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 #FROM python:3.6-stretch
 
 #RUN echo "deb http://ftp.debian.org/debian stretch main contrib" > /etc/apt/sources.list
@@ -22,11 +22,13 @@ FROM ubuntu:18.04
 #                        libcairo2 \
 #                        libpangocairo-1.0-0 \
 #    && apt-get -y clean
+ENV TZ=PST8PDT
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get -y update && apt-get install -y build-essential python3-dev python3-pip python3-setuptools python3-wheel python3-cffi libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info libjpeg-dev zlib1g-dev
 
 ADD weasyprint /app/weasyprint
-ADD bootstrap/bootstrap.css /app/bootstrap/bootstrap.css
+ADD bootstrap /app/bootstrap
 ADD fonts /usr/share/fonts
 ADD requirements.txt /app/requirements.txt
 ADD fonts.py /app/fonts.py

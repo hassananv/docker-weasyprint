@@ -43,11 +43,11 @@ BOX_TYPE_FROM_DISPLAY = {
 
 
 def build_formatting_structure(element_tree, style_for, get_image_from_uri,
-                               base_url, target_collector, counter_style):
+                               base_url, target_collector, counter_style, byteio_images_info=None):
     """Build a formatting structure (box tree) from an element tree."""
     box_list = element_to_box(
         element_tree, style_for, get_image_from_uri, base_url,
-        target_collector, counter_style)
+        target_collector, counter_style, byteio_images_info=byteio_images_info)
     if box_list:
         box, = box_list
     else:
@@ -62,7 +62,7 @@ def build_formatting_structure(element_tree, style_for, get_image_from_uri,
             return style
         box, = element_to_box(
             element_tree, root_style_for, get_image_from_uri, base_url,
-            target_collector, counter_style)
+            target_collector, counter_style, byteio_images_info=byteio_images_info)
 
     target_collector.check_pending_targets()
 
@@ -84,7 +84,7 @@ def make_box(element_tag, style, content, element):
 
 
 def element_to_box(element, style_for, get_image_from_uri, base_url,
-                   target_collector, counter_style, state=None):
+                   target_collector, counter_style, byteio_images_info=None, state=None):
     """Convert an element and its children into a box with children.
 
     Return a list of boxes. Most of the time the list will have one item but
@@ -167,7 +167,7 @@ def element_to_box(element, style_for, get_image_from_uri, base_url,
     for child_element in element:
         children.extend(element_to_box(
             child_element, style_for, get_image_from_uri, base_url,
-            target_collector, counter_style, state))
+            target_collector, counter_style, byteio_images_info, state))
         text = child_element.tail
         if text:
             text_box = boxes.TextBox.anonymous_from(box, text)
@@ -206,7 +206,7 @@ def element_to_box(element, style_for, get_image_from_uri, base_url,
             box.children.append(boxes.TextBox.anonymous_from(box, '​'))
 
     # Specific handling for the element. (eg. replaced element)
-    return html.handle_element(element, box, get_image_from_uri, base_url)
+    return html.handle_element(element, box, get_image_from_uri, base_url, byteio_images_info)
 
 
 def before_after_to_box(element, pseudo_type, state, style_for,

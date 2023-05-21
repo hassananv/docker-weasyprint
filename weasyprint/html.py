@@ -21,6 +21,7 @@ from .css.counters import CounterStyle
 from .formatting_structure import boxes
 from .logger import LOGGER
 from .urls import get_url_attribute
+from .images import get_image_from_byte_io
 
 # XXX temporarily disable logging for user-agent stylesheet
 level = LOGGER.level
@@ -79,12 +80,15 @@ def element_has_link_type(element, link_type):
 HTML_HANDLERS = {}
 
 
-def handle_element(element, box, get_image_from_uri, base_url):
+def handle_element(element, box, get_image_from_uri, base_url, byteio_images_info=None):
     """Handle HTML elements that need special care.
 
     :returns: a (possibly empty) list of boxes.
     """
-    if box.element_tag in HTML_HANDLERS:
+    if box.element_tag=='img':
+        return HTML_HANDLERS[element.tag](
+            element, box, get_image_from_uri, base_url, byteio_images_info)
+    elif box.element_tag in HTML_HANDLERS:
         return HTML_HANDLERS[element.tag](
             element, box, get_image_from_uri, base_url)
     else:
@@ -121,13 +125,28 @@ def make_replaced_box(element, box, image):
 
 
 @handler('img')
-def handle_img(element, box, get_image_from_uri, base_url):
+def handle_img(element, box, get_image_from_uri, base_url, byteio_images_info):
     """Handle ``<img>`` elements, return either an image or the alt-text.
 
     See: http://www.w3.org/TR/html5/embedded-content-1.html#the-img-element
 
     """
-    src = get_url_attribute(element, 'src', base_url)
+
+    if ('src' in element.attrib and
+        byteio_images_info is not None and
+        element.attrib['src'].startswith('./byteio/') and 
+        element.attrib['src'][9:] in byteio_images_info
+    ):
+        file_key = element.attrib['src'][9:]
+        try: 
+            image = get_image_from_byte_io(byteio_images_info[file_key] , ('.svg' in file_key))            
+            return [make_replaced_box(element, box, image)]
+        except BaseException:
+            src = ''
+            LOGGER.error('Missing Attached ByteIO image.')
+    else: 
+        src = get_url_attribute(element, 'src', base_url)
+
     alt = element.get('alt')
     if src:
         image = get_image_from_uri(src)

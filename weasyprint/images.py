@@ -174,6 +174,19 @@ class SVGImage:
                 'Failed to draw an SVG image at %s : %s', self._base_url, e)
 
 
+def get_image_from_byte_io(byte_io_image, svg):
+    """Get a cairo Pattern from an image in byteIO."""
+    
+    if svg: 
+        image = SVGImage(byte_io_image, 'None', 'url_fetcher')
+    else:
+        string = byte_io_image.getvalue()    
+        surface, format_name = (pixbuf.decode_to_image_surface(string))
+        image = RasterImage(surface)
+
+    return image
+
+
 def get_image_from_uri(cache, url_fetcher, optimize_images, url,
                        forced_mime_type=None):
     """Get a cairo Pattern from an image URI."""

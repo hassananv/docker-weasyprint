@@ -2,7 +2,7 @@
 
 import json
 import logging
-
+import io
 from flask import Flask, request, make_response
 from weasyprint import HTML
 from fonts import css_for_extra_fonts
@@ -14,8 +14,9 @@ def index():
     return 'ok'
 
 
-@app.before_first_request
-def setup_logging():
+# @app.before_first_request
+# def setup_logging():
+with app.app_context():
     logging.addLevelName(logging.DEBUG, "\033[1;36m%s\033[1;0m" % logging.getLevelName(logging.DEBUG))
     logging.addLevelName(logging.INFO, "\033[1;32m%s\033[1;0m" % logging.getLevelName(logging.INFO))
     logging.addLevelName(logging.WARNING, "\033[1;33m%s\033[1;0m" % logging.getLevelName(logging.WARNING))
@@ -49,13 +50,34 @@ def home():
 
 @app.route('/pdf', methods=['POST'])
 def generate():
+    
     name = request.args.get('filename', 'unnamed.pdf')
     add_bootstrap_style = bool(request.args.get('bootstrap', 'false').lower()=='true')    
+    add_vuetify_style = bool(request.args.get('vuetify', 'false').lower()=='true')   
+    add_byteio_images = bool(request.args.get('images', 'false').lower()=='true')
     app.logger.info('POST  /pdf?filename=%s' % name)
     #print ( request.get_data(as_text=True) )
-    html = HTML(string=request.get_data(as_text=True))
-    css, font_config = css_for_extra_fonts(add_bootstrap_style)
-    pdf = html.write_pdf(stylesheets=[css], font_config=font_config)
+
+    if add_byteio_images:
+        html_file=request.files.getlist('html')
+        image_files=request.files.getlist('images')
+
+        image_info = dict()
+        for image_file in image_files:
+
+            if image_file.content_type=='string' or "svg" in image_file.content_type:
+                image_info[image_file.filename]=image_file.read()
+            else:
+                image_info[image_file.filename]=io.BytesIO(image_file.read())
+        
+        html = HTML(string=html_file[0].read())
+        
+    else:
+        html = HTML(string=request.get_data(as_text=True))
+        image_info = None
+    
+    css, font_config = css_for_extra_fonts(add_bootstrap_style, add_vuetify_style)
+    pdf = html.write_pdf(stylesheets=[css], font_config=font_config, byteio_images_info=image_info)
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name

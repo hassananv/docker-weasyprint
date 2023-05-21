@@ -1,0 +1,17 @@
+********************
+The Fonts licensed under the SIL Open Font License : (Please Read LICENSE_OFL.txt)
+-----------------------------------------------------------
+ - BC Sans
+ - DM Sans
+ - Aleo
+ - Montserrat
+ - Libre Barcode 39
+ - Noto Sans
+
+
+
+********************
+The Fonts licensed under the Apache License, Version 2.0 : (Please Read LICENSE_Apache_2.txt)
+-----------------------------------------------------------
+ - Roboto
+ - Arimo

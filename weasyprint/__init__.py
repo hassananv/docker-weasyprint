@@ -135,7 +135,8 @@ class HTML:
 
     def render(self, stylesheets=None, enable_hinting=False,
                presentational_hints=False, optimize_images=False,
-               font_config=None, counter_style=None, image_cache=None):
+               font_config=None, counter_style=None, image_cache=None,
+               byteio_images_info=None):
         """Lay out and paginate the document, but do not (yet) export it
         to PDF or PNG.
 
@@ -171,12 +172,13 @@ class HTML:
         """
         return Document._render(
             self, stylesheets, enable_hinting, presentational_hints,
-            optimize_images, font_config, counter_style, image_cache)
+            optimize_images, font_config, counter_style, image_cache,
+            byteio_images_info)
 
     def write_pdf(self, target=None, stylesheets=None, zoom=1,
                   attachments=None, presentational_hints=False,
                   optimize_images=False, font_config=None, counter_style=None,
-                  image_cache=None):
+                  image_cache=None, byteio_images_info=None):
         """Render the document to a PDF file.
 
         This is a shortcut for calling :meth:`render`, then
@@ -223,7 +225,7 @@ class HTML:
                 stylesheets, enable_hinting=False,
                 presentational_hints=presentational_hints,
                 optimize_images=optimize_images, font_config=font_config,
-                counter_style=counter_style, image_cache=image_cache)
+                counter_style=counter_style, image_cache=image_cache, byteio_images_info=byteio_images_info)
             .write_pdf(target, zoom, attachments))
 
     def write_image_surface(self, stylesheets=None, resolution=96,

@@ -395,7 +395,7 @@ class Document:
     @classmethod
     def _render(cls, html, stylesheets, enable_hinting,
                 presentational_hints=False, optimize_images=False,
-                font_config=None, counter_style=None, image_cache=None):
+                font_config=None, counter_style=None, image_cache=None, byteio_images_info=None):
         if font_config is None:
             font_config = FontConfiguration()
 
@@ -408,7 +408,7 @@ class Document:
 
         root_box = build_formatting_structure(
             html.etree_element, context.style_for, context.get_image_from_uri,
-            html.base_url, context.target_collector, counter_style)
+            html.base_url, context.target_collector, counter_style, byteio_images_info)
 
         page_boxes = layout_document(html, root_box, context)
         rendering = cls(
